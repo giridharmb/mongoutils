@@ -109,7 +109,7 @@ func InsertGenericIfNotExists(data GenericData, db string, coll string) (resultS
 		return resultStatus, nil
 	}
 	debugMessage = fmt.Sprintf("InsertGenericIfNotExists() : Matched %v documents and updated %v documents.", updateResult.MatchedCount, updateResult.ModifiedCount)
-	fmt.Printf("\n%v\n", debugMessage)
+	log.Println(debugMessage)
 	resultStatus["insertion"] = "successful"
 	resultStatus["status"] = debugMessage
 	resultStatus["error"] = "nil"
@@ -189,9 +189,9 @@ func DeleteGenericIfExists(key string, db string, coll string) (resultStatus map
 		return resultStatus, nil
 	}
 	debugMessage = fmt.Sprintf("Deleted (%v) # of documents", deleteResult.DeletedCount)
-	fmt.Printf("\n%v\n", debugMessage)
+	log.Println(debugMessage)
 	debugMessage = fmt.Sprintf("deleteGenericIfExists() : Deleted Document with key (%v)", key)
-	fmt.Printf("\n%v\n", debugMessage)
+	log.Println(debugMessage)
 	resultStatus["deletion"] = "successful"
 	resultStatus["error"] = "nil"
 	return resultStatus, nil
@@ -207,7 +207,6 @@ func FetchCollection(db string, coll string) (results []interface{}, err error) 
 		if r := recover(); r != nil {
 			debugMessage = fmt.Sprintf("FetchCollection : Recovered in f : %v", r)
 			Logger.Debug(debugMessage)
-
 			// find out exactly what the error was and set err
 			switch x := r.(type) {
 			case string:
@@ -425,7 +424,7 @@ func InsertManyIfNotExists(kvList []GenericData, db string, coll string) (result
 			status[kv.Key] = "successful"
 			status["error"] = "nil"
 			debugMessage = fmt.Sprintf("InsertManyIfNotExists() : Matched %v documents and updated %v documents.", updateResult.MatchedCount, updateResult.ModifiedCount)
-			fmt.Printf("\n%v\n", debugMessage)
+			log.Println(debugMessage)
 		}
 		resultStatus = append(resultStatus, status)
 	}
@@ -500,7 +499,7 @@ func FindGenericRecord(key string, db string, coll string) (seachedRecord map[st
 		return seachedRecord, nil
 	}
 	debugMessage = fmt.Sprintf("FindGenericRecord() : Found a single document: %+v", result)
-	fmt.Printf("\n%v\n", debugMessage)
+	log.Println(debugMessage)
 	seachedRecord["search_result"] = "found"
 	seachedRecord["key"] = key
 	seachedRecord["error"] = ""
@@ -556,13 +555,13 @@ func FindMultipleGenericRecord(keys []string, db string, coll string) (seachedRe
 		for w := 1; w <= maxNumberOfWorkers; w++ {
 			go findWorker(jobs, results)
 		}
-		fmt.Printf("\n@ Putting data into jobs...\n")
+		log.Println("@ Putting data into jobs...")
 		for _, job := range jobList {
 			jobs <- job
 		}
-		fmt.Printf("\n@ jobs channel got all data !\n")
+		log.Println("@ jobs channel got all data !")
 		close(jobs)
-		fmt.Printf("\n@ jobs channel closed !\n")
+		log.Println("@ jobs channel closed !")
 	}(&wg)
 
 	wg.Add(1)
